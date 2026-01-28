@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>PRÁCTICA 1: GEOLOCALIZACIÓN Y REDES SOCIALES</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --p: #003b5c; --s: #d35400; --bg: #f0f3f5; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; height: 100vh; }
+        header { background: var(--p); color: white; padding: 15px; text-align: center; }
+        .layout { display: grid; grid-template-columns: 320px 1fr 380px; gap: 15px; padding: 15px; flex: 1; }
+        .panel { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: flex; flex-direction: column; }
+        select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--p); font-weight: bold; margin-bottom: 20px; }
+        .caja-info { background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--s); }
+        .caja-info p { margin: 5px 0 0; font-size: 13px; }
+        iframe { width: 100%; height: 100%; border: none; border-radius: 10px; }
+        
+        .fb-viewer { height: 450px; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
+        .btn-x, .btn-web { 
+            color: white; text-align: center; padding: 15px; 
+            border-radius: 8px; text-decoration: none; font-weight: bold; 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-size: 14px; transition: 0.3s; margin-top: 10px;
+        }
+        .btn-x { background: #000; }
+        .btn-web { background: #27ae60; }
+        .btn-x:hover, .btn-web:hover { opacity: 0.8; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <header><h1>PRÁCTICA 1: GEOLOCALIZACIÓN Y REDES SOCIALES</h1></header>
+    <div class="layout">
+        <div class="panel">
+            <label style="font-size:11px; font-weight:bold; color:#7f8c8d;">SELECCIONAR INSTITUCIÓN:</label>
+            <select id="sel" onchange="actualizar()">
+                <option value="utn">UTN Nezahualcóyotl</option>
+                <option value="uaem">UAEM Nezahualcóyotl</option>
+                <option value="lasalle">La Salle Neza</option>
+                <option value="fes">FES Aragón (UNAM)</option>
+            </select>
+            <div class="caja-info"><strong>COORDENADAS GPS</strong><p id="coords">--</p></div>
+            <div class="caja-info"><strong>DIRECCIÓN OFICIAL</strong><p id="dir">--</p></div>
+            
+            <a id="linkWeb" href="#" target="_blank" class="btn-web">
+                <i class="fas fa-globe"></i> Visitar Página Oficial
+            </a>
+        </div>
+
+        <div class="panel" style="padding:0;">
+            <iframe id="mapa" src=""></iframe>
+        </div>
+
+        <div class="panel">
+            <label style="font-size:11px; font-weight:bold; color:#7f8c8d; margin-bottom:10px;">COMUNIDAD SOCIAL:</label>
+            <div class="fb-viewer">
+                <iframe id="fb" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+            </div>
+            <a id="linkX" href="#" target="_blank" class="btn-x">
+                <i class="fab fa-x-twitter"></i> Ver perfil oficial en X
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const db = {
+            "utn": {
+                c: "19.3899, -98.9856", d: "Lázaro Cárdenas s/n, Benito Juárez, Nezahualcóyotl.",
+                m: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3763.4862215647575!2d-98.9911910239091!3d19.390219942037943!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1e2e600000001%3A0x6b9079f22591603d!2sUAEM%20Centro%20Universitario%20Nezahualc%C3%B3yotl!5e0!3m2!1ses-419!2smx!4v17000000000016",
+                fb: "https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FUTNOficial&tabs=timeline&width=340&height=450&small_header=true",
+                x: "https://x.com/OficialUTN",
+                web: "https://utn.edomex.gob.mx/"
+            },
+            "uaem": {
+                c: "19.3980, -98.9890", d: "Av. de los Búhos s/n, Universidad, Nezahualcóyotl.",
+                m: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3763.4862215647575!2d-98.9911910239091!3d19.390219942037943!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1e2e600000001%3A0x6b9079f22591603d!2sUAEM%20Centro%20Universitario%20Nezahualc%C3%B3yotl!5e0!3m2!1ses-419!2smx!4v17000000000017",
+                fb: "https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FCU.UAEMNEZA.OFICIAL&tabs=timeline&width=340&height=450&small_header=true",
+                x: "https://x.com/UAEM_MX",
+                web: "https://www.uaemex.mx/"
+            },
+            "lasalle": {
+                c: "19.3810, -98.9950", d: "Av. Adolfo López Mateos s/n, Nezahualcóyotl.",
+                m: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3763.4862215647575!2d-98.9911910239091!3d19.390219942037943!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1e2e600000001%3A0x6b9079f22591603d!2sUAEM%20Centro%20Universitario%20Nezahualc%C3%B3yotl!5e0!3m2!1ses-419!2smx!4v17000000000018",
+                fb: "https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Flasalleneza&tabs=timeline&width=340&height=450&small_header=true",
+                x: "https://x.com/LaSalle_MX",
+                web: "https://ulsaneza.edu.mx/"
+            },
+            "fes": {
+                c: "19.4746, -99.0463", d: "Av. Rancho Seco s/n, Bosques de Aragón, Neza.",
+                m: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3763.4862215647575!2d-98.9911910239091!3d19.390219942037943!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1e2e600000001%3A0x6b9079f22591603d!2sUAEM%20Centro%20Universitario%20Nezahualc%C3%B3yotl!5e0!3m2!1ses-419!2smx!4v17000000000019",
+                fb: "https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FFESAragonUNAM&tabs=timeline&width=340&height=450&small_header=true",
+                x: "https://x.com/ici_fesaragon",
+                web: "https://www.aragon.unam.mx/"
+            }
+        };
+
+        function actualizar() {
+            const val = document.getElementById("sel").value;
+            const u = db[val];
+            document.getElementById("coords").innerText = u.c;
+            document.getElementById("dir").innerText = u.d;
+            document.getElementById("mapa").src = u.m;
+            document.getElementById("fb").src = u.fb;
+            document.getElementById("linkX").href = u.x;
+            document.getElementById("linkWeb").href = u.web;
+        }
+        window.onload = actualizar;
+    </script>
+</body>
+</html>

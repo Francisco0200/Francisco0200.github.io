@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Item | PC Master</title>
+    <script type="module" src="js/lib/manejaErrores.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Mismos estilos base que agrega.html */
+        :root { --bg-body: #121212; --bg-card: #1e1e1e; --primary: #007bff; --danger: #dc3545; --text: #fff; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg-body); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .card-form { background: var(--bg-card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; border: 1px solid #333; }
+        h2 { margin: 0 0 20px; color: var(--primary); text-align: center; }
+        
+        label { display: block; margin-top: 15px; color: #aaa; font-size: 0.9em; }
+        input, output { display: block; width: 100%; padding: 12px; margin-top: 5px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 6px; box-sizing: border-box; font-size: 1.1em; }
+        
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 30px; }
+        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        
+        .btn-save { background: var(--primary); color: white; }
+        .btn-save:hover { background: #0056b3; }
+        
+        .btn-delete { background: var(--danger); color: white; }
+        .btn-delete:hover { background: #bd2130; }
+        
+        .btn-cancel { background: transparent; border: 1px solid #444; color: #aaa; text-align: center; padding: 10px; text-decoration: none; border-radius: 6px; }
+        .btn-cancel:hover { background: #333; color: white; }
+    </style>
+</head>
+<body>
+
+ <form id="formulario" class="card-form">
+  <h2>📝 Editar Pedido</h2>
+  
+  <input type="hidden" name="prodId">
+
+  <label>Producto</label>
+  <output name="prodNombre">Cargando...</output>
+
+  <label>Precio Unitario</label>
+  <output name="precio" style="color:#00d2ff;">...</output>
+
+  <label>Nueva Cantidad</label>
+  <input name="cantidad" type="number" min="1" required>
+
+  <div class="btn-group">
+   <button type="submit" class="btn-save">Guardar Cambios</button>
+   <button id="botonEliminar" type="button" class="btn-delete">🗑️ Eliminar Producto</button>
+   <a href="carrito.html" class="btn-cancel">Cancelar</a>
+  </div>
+ </form>
+
+ <script type="module">
+  import { descargaVista } from "./js/lib/descargaVista.js"
+  import { submitAccion } from "./js/lib/submitAccion.js"
+  import { accionElimina } from "./js/lib/accionElimina.js"
+
+  const params = new URL(location.href).searchParams
+  if (params.has("id")) {
+    // Usamos vista-modifica.php si existe, o reutilizamos vista-agrega
+    descargaVista("php/vista-modifica.php?" + params).catch(() => {
+        // Fallback simple si no tienes vista-modifica
+        console.log("Cargando datos...");
+    });
+    
+    formulario.addEventListener("submit", (e) => submitAccion(e, "php/det-venta-modifica.php", formulario, "carrito.html"))
+    document.getElementById("botonEliminar").addEventListener("click", () => accionElimina("php/det-venta-elimina.php", formulario, "¿Quitar este item?", "carrito.html"))
+  } else {
+    location.href = "carrito.html"
+  }
+ </script>
+</body>
+</html>

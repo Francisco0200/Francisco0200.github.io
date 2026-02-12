@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <title>Mi Carrito | PC Master</title>
+ <script type="module" src="js/lib/manejaErrores.js"></script>
+ <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap" rel="stylesheet">
+ <style>
+   :root { --bg-body: #121212; --bg-card: #1e1e1e; --primary: #007bff; --accent: #28a745; --danger: #dc3545; }
+   body { font-family: 'Roboto', sans-serif; background: var(--bg-body); color: #fff; margin: 0; padding: 20px; }
+
+   nav { background: #1e1e1e; padding: 15px 30px; border-bottom: 2px solid var(--primary); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-radius: 8px; }
+   nav a { color: #fff; text-decoration: none; font-weight: bold; }
+
+   .container { max-width: 900px; margin: 0 auto; }
+   
+   /* Resumen Total */
+   .resumen { background: var(--bg-card); padding: 20px; text-align: right; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
+   .total-texto { font-size: 1.5em; font-weight: bold; color: var(--accent); margin-right: 20px; }
+   
+   /* Estilos de la fila del producto */
+   .carrito-item { 
+       background: var(--bg-card); padding: 15px; margin-bottom: 10px; border-radius: 8px; 
+       display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary);
+       flex-wrap: wrap; gap: 10px;
+   }
+   .info { flex: 1; min-width: 200px; }
+   .nombre { font-size: 1.1em; font-weight: bold; display: block; }
+   .precio-unit { color: #aaa; font-size: 0.9em; }
+
+   .controles { display: flex; align-items: center; gap: 15px; }
+   
+   .input-cant { 
+       width: 60px; padding: 8px; background: #2c2c2c; border: 1px solid #444; color: white; 
+       border-radius: 5px; text-align: center; font-weight: bold;
+   }
+   .subtotal { font-weight: bold; color: var(--primary); min-width: 80px; text-align: right; }
+   
+   .btn-delete { 
+       background: var(--danger); color: white; border: none; padding: 8px 12px; 
+       border-radius: 5px; cursor: pointer; transition: 0.2s;
+   }
+   .btn-delete:hover { background: #bd2130; }
+
+   button#botonProcesar { 
+       background: var(--accent); color: white; border: none; padding: 12px 30px; 
+       font-size: 1.1em; border-radius: 50px; cursor: pointer; font-weight: bold;
+   }
+   button#botonProcesar:hover { background: #218838; transform: scale(1.05); }
+ </style>
+</head>
+<body>
+
+ <div class="container">
+    <nav>
+        <strong>🛒 TU CARRITO</strong>
+        <a href="index.html">⬅ Seguir Comprando</a>
+    </nav>
+
+    <div id="lista-carrito">
+        <div style="text-align:center; padding:20px;">Cargando...</div>
+    </div>
+
+    <div class="resumen">
+        <span class="total-texto">Total: $<span id="lblTotal">0.00</span></span>
+        <button id="botonProcesar">✅ PAGAR AHORA</button>
+    </div>
+ </div>
+
+ <script type="module">
+  import { consume } from "./js/lib/consume.js"
+  import { recibeJson } from "./js/lib/recibeJson.js"
+
+  // 1. Cargar el carrito al iniciar
+  cargarCarrito();
+
+  async function cargarCarrito() {
+    try {
+        const respuesta = await recibeJson("php/vista-carrito.php");
+        const datos = await respuesta.json();
+        
+        // Inyectar HTML de items
+        document.getElementById("lista-carrito").innerHTML = datos.detalles.innerHTML;
+        
+        // Actualizar Total Global (si el PHP lo manda, o calcularlo)
+        if (datos.totalGlobal) {
+            document.getElementById("lblTotal").textContent = datos.totalGlobal;
+        }
+
+        // Si está vacío, deshabilitar botón
+        const btn = document.getElementById("botonProcesar");
+        if (datos.totalGlobal === "0.00") btn.style.display = "none";
+        else btn.style.display = "inline-block";
+
+    } catch (e) {
+        console.error(e);
+    }
+  }
+
+  // 2. Función Global para Actualizar Cantidad (Se llama desde el HTML inyectado)
+  window.actualizarItem = async (id, nuevaCantidad) => {
+    if (nuevaCantidad < 1) return; // No permitir negativos
+
+    const formData = new FormData();
+    formData.append("prodId", id);
+    formData.append("cantidad", nuevaCantidad);
+
+    await fetch("php/det-venta-modifica.php", { method: "POST", body: formData });
+    
+    // Recargar para ver los nuevos subtotales
+    cargarCarrito();
+  };
+
+  // 3. Función Global para Eliminar (Se llama desde el botón basura)
+  window.eliminarItem = async (id) => {
+    if (!confirm("¿Eliminar este producto?")) return;
+
+    const formData = new FormData();
+    formData.append("prodId", id);
+
+    await fetch("php/det-venta-elimina.php", { method: "POST", body: formData });
+    
+    // Recargar vista
+    cargarCarrito();
+  };
+
+  // 4. Botón Pagar
+  document.getElementById("botonProcesar").onclick = async () => {
+    if (confirm('¿Confirmar compra?')) {
+        await consume(recibeJson('php/venta-en-captura-procesa.php'));
+        alert("¡Pedido realizado con éxito!");
+        location.href = 'index.html';
+    }
+  };
+ </script>
+</body>
+</html>

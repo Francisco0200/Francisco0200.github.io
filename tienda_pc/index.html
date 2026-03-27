@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Master | Hardware High-End</title>
+    <script type="module" src="js/lib/manejaErrores.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-body: #121212;
+            --bg-card: #1e1e1e;
+            --primary: #007bff; /* Azul DD Tech */
+            --primary-hover: #0056b3;
+            --text-main: #ffffff;
+            --text-sec: #b0b0b0;
+            --accent: #00d2ff;
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        /* NAVBAR ESTILO E-COMMERCE */
+        nav { 
+            background: rgba(30, 30, 30, 0.95); 
+            padding: 15px 40px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .brand { font-size: 1.8em; font-weight: 700; color: white; letter-spacing: 1px; }
+        .brand span { color: var(--primary); }
+
+        .nav-links a { 
+            color: var(--text-main); 
+            text-decoration: none; 
+            margin-left: 25px; 
+            font-weight: 500; 
+            transition: 0.3s; 
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-links a.cart-btn { background: var(--primary); padding: 8px 15px; border-radius: 4px; }
+        .nav-links a.cart-btn:hover { background: var(--primary-hover); color: white; }
+
+        /* HERO BANNER (LO QUE FALTABA) */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+            margin-bottom: 40px;
+        }
+        .hero h1 { font-size: 3em; margin: 0; text-shadow: 0 0 20px var(--primary); }
+        .hero p { font-size: 1.2em; color: var(--text-sec); margin-top: 10px; }
+
+        /* GRID DE PRODUCTOS */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        dl#lista { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+            padding-bottom: 50px;
+        }
+
+        /* TARJETA DE PRODUCTO PRO */
+        .tarjeta-producto { 
+            background: var(--bg-card); 
+            border-radius: 10px; 
+            overflow: hidden; 
+            transition: transform 0.3s, box-shadow 0.3s; 
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tarjeta-producto:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 20px rgba(0, 123, 255, 0.2); 
+            border-color: var(--primary);
+        }
+
+        .tarjeta-producto img { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover; 
+            border-bottom: 1px solid #333; 
+        }
+
+        .card-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+
+        dt { 
+            font-size: 1.1em; 
+            font-weight: 700; 
+            margin-bottom: 10px; 
+            color: white; 
+            height: 50px; /* Altura fija para alinear títulos */
+            overflow: hidden;
+        }
+
+        dd { margin: 0; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; }
+
+        .price-stock { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            font-size: 0.9em; 
+            color: var(--text-sec); 
+        }
+        .price-tag { font-size: 1.4em; color: var(--accent); font-weight: bold; }
+
+        a.btn { 
+            background: transparent; 
+            color: var(--primary); 
+            border: 2px solid var(--primary); 
+            padding: 10px; 
+            text-align: center; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            transition: 0.3s; 
+            display: block; 
+            margin-top: auto;
+        }
+        
+        a.btn:hover { background: var(--primary); color: white; }
+
+        /* LOADING */
+        progress { width: 100%; height: 20px; accent-color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">PC <span>MASTER</span></div>
+        <div class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="soporte.html">Soporte Chat</a>
+            <a href="carrito.html" class="cart-btn">🛒 Ver Carrito</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>TU SETUP SOÑADO</h1>
+        <p>Los mejores componentes con envío a todo México</p>
+    </div>
+
+    <div class="container">
+        <h2 style="border-left: 5px solid var(--primary); padding-left: 15px;">Productos Destacados</h2>
+        
+        <dl id="lista">
+            <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                <p>Cargando inventario...</p>
+                <progress max="100"></progress>
+            </div>
+        </dl>
+    </div>
+
+    <footer style="background: #0f0f0f; padding: 20px; text-align: center; color: #555; font-size: 0.8em; margin-top: 50px;">
+        &copy; 2026 PC Master Store - Desarrollado para la clase de Web
+    </footer>
+
+    <script type="module">
+        import { descargaVista } from "./js/lib/descargaVista.js"
+        // Llamada al backend
+        descargaVista("php/vista-index.php")
+    </script>
+
+</body>
+</html>

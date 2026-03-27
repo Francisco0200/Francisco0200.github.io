@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width">
+
+ <title>Productos</title>
+
+ <script type="module" src="js/lib/manejaErrores.js"></script>
+
+</head>
+
+<body>
+
+ <h1>Productos</h1>
+
+ <p><a href="carrito.html">Ver carrito</a></p>
+
+ <dl id="lista">
+  <dt>Cargando&hellip;</dt>
+  <dd><progress max="100">Cargando&hellip;</progress></dd>
+ </dl>
+
+ <script type="module">
+
+  import { descargaVista } from "./js/lib/descargaVista.js"
+
+  descargaVista("php/vista-index.php")
+
+ </script>
+
+</body>
+<nav style="background: #2c3e50; padding: 15px; display: flex; justify-content: space-around; align-items: center; color: white; margin-bottom: 20px;">
+  <strong style="color: #e67e22;">PC MASTER STORE</strong>
+  <div style="display: flex; gap: 20px;">
+    <a href="tienda.html" style="color: white; text-decoration: none; font-weight: bold;">🏠 Catálogo</a>
+    <a href="carrito.html" style="color: white; text-decoration: none; font-weight: bold;">🛒 Mi Carrito</a>
+    <a href="soporte.html" style="color: white; text-decoration: none; font-weight: bold;">💬 Soporte Técnico</a>
+    <a href="index.html" onclick="localStorage.clear();" style="color: #ff7675; text-decoration: none; font-weight: bold;">🚪 Cerrar Sesión</a>
+  </div>
+</nav>
+
+</html>
